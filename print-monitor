@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ### BEGIN INIT INFO
 # Provides:          print-monitor
 # Required-Start:    $remote_fs $syslog
@@ -9,9 +9,12 @@
 # Description:       Monitors folder for added files and prints them
 ### END INIT INFO
 
-MONITORDIR="/home/pi/ftp/invoice/"
-inotifywait -m -e close_write --format '%w%f' "${MONITORDIR}" | while read file;
+if [ -f /etc/print-monitor.conf ]; then source /etc/print-monitor.conf
+elif echo "ERROR: Please move the config file to /etc/print-monitor.conf"; then exit
+fi
+
+inotifywait -m -e close_write --format '%w%f' "$monitorDir" | while read file;
 do
-	lpr -P TSP650II  "${file}";
+	lpr -P "$printerQueue" "${file}";
 	sudo rm -f "${file}";
 done
